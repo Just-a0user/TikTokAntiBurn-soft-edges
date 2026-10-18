@@ -4,6 +4,7 @@ import static made.by.human.tiktokantiburn.utils.tools.setSafeValue;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -12,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -84,15 +86,14 @@ public class MainSettingsFragment extends Fragment {
 
         MaterialSwitch hideOnTouch = view.findViewById(R.id.HideOnTouch);
         MaterialSwitch ClickThroughToggle = view.findViewById(R.id.ClickThroughToggle);
+        ConstraintLayout ClickThroughMode = view.findViewById(R.id.Main_3_1);
 
         hideOnTouch.setOnCheckedChangeListener(((buttonView, isChecked) -> {
             Settings.Service.setBool(ctx, "HideOnTouch", isChecked);
             if (isChecked && !ClickThroughToggle.isChecked()) {
-                ClickThroughToggle.setEnabled(false);
-                ClickThroughToggle.setAlpha(0.75f);
+                ClickThroughMode.setVisibility(View.GONE);
             } else {
-                ClickThroughToggle.setEnabled(true);
-                ClickThroughToggle.setAlpha(1f);
+                ClickThroughMode.setVisibility(View.VISIBLE);
             }
         }));
         hideOnTouch.setChecked(Settings.Service.getBool(ctx, "HideOnTouch", false));
@@ -127,6 +128,9 @@ public class MainSettingsFragment extends Fragment {
         if (setValue > DefaultPanelHeight.getValueTo()) {setValue = (int) DefaultPanelHeight.getValueTo();}
         setSafeValue(DefaultPanelHeight, setValue);
 
+
+        TextView AlphaValueProblem = view.findViewById(R.id.AlphaValueProblem);
+        AlphaValueProblem.setVisibility(Build.VERSION.SDK_INT <= Build.VERSION_CODES.R ? View.GONE : View.VISIBLE);
 
 
         ConstraintDefaultPanelHeight = view.findViewById(R.id.ConstraintDefaultPanelHeight);

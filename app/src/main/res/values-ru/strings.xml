@@ -107,4 +107,5 @@
     <string name="LockTimerTitle">Время ожидания</string>
     <string name="LockTimerDesc">Укажите, сколько минут нужно ждать перед тем как заблокировать экран</string>
     <string name="LockTimerTitle_Format">%1$s — %2$d мин.</string>
+    <string name="AlphaValueProblem">"Android 12 и выше, \"в целях безопасности\" в  этом режиме, ограничивает непрозрачность элементов делая их прозрачными на 20%. "</string>
 </resources>

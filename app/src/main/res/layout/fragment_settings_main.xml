@@ -101,11 +101,18 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
+        <View
+            android:id="@+id/divider13"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="12dp"
+            android:background="@color/Settings" />
+
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/Main_3"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginTop="4dp"
+            android:layout_marginTop="12dp"
             android:background="@drawable/fast_setting_bg"
             android:padding="12dp">
 
@@ -144,13 +151,24 @@
                 android:textColor="@color/SeekBackgroundFilled"
                 android:textSize="18sp"
                 android:textStyle="bold"
-                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:thumbTint="@color/SeekBackgroundFilled"
                 app:trackDecorationTint="@color/SeekBackgroundFilled"
                 app:trackTint="@color/MID" />
+
+            <TextView
+                android:id="@+id/AlphaValueProblem"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:alpha="0.75"
+                android:background="@drawable/inline_setting"
+                android:padding="10dp"
+                android:text="@string/AlphaValueProblem"
+                android:textColor="#FFC47E"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/ClickThroughToggle" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
