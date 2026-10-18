@@ -60,6 +60,13 @@ public class SettingsActivity extends AppCompatActivity {
             return false;
         });
 
+        if (RootCheck.getCached() == null) {
+            RootCheck.isDeviceRootedAsync(rooted -> {
+                if (isFinishing() || isDestroyed()) return;
+                adapter.setHaveRoot(rooted);
+            });
+        }
+
         toolbar.setNavigationOnClickListener(v -> {
             finish();
         });

@@ -24,11 +24,23 @@ public class PageAdapter extends FragmentStateAdapter {
     }
 
     public void init() {
-        haveRoot = RootCheck.isDeviceRooted();
+        Boolean cached = RootCheck.getCached();
+        haveRoot = cached != null && cached;
         AdditionalSettings = new AdditionalSettingsFragment();
         LSPosedSettings = new LSPosedSettingsFragment();
         MainSettings = new MainSettingsFragment();
     }
+    public void setHaveRoot(boolean root) {
+        if (root == haveRoot) return;
+        Log.d("RootChecker", "Have Root: "+root);
+        haveRoot = root;
+        if (root) {
+            notifyItemInserted(tabsCount - 1);
+        } else {
+            notifyItemRemoved(tabsCount - 1);
+        }
+    }
+
 
     public void onResumeNotify() {
         LSPosedSettings.onResumeNotify();
