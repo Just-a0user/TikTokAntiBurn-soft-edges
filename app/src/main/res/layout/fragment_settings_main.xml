@@ -151,6 +151,7 @@
                 app:thumbTint="@color/SeekBackgroundFilled"
                 app:trackDecorationTint="@color/SeekBackgroundFilled"
                 app:trackTint="@color/MID" />
+
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <View

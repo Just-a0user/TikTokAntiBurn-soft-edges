@@ -105,4 +105,9 @@
     <string name="FloatingWindowsLimitError">You have reached the window limit of your firmware</string>
     <string name="GrandOverlayFirst">Please grant overlay permission first!</string>
     <string name="ServiceOverlayPermissionNotGranted">Please grant overlay permission!</string>
+    <string name="LockThePhoneTitle">Turn off the screen when inactive</string>
+    <string name="LockThePhoneDesc">If no taps are made within a certain period of time, the screen will turn off. This only works if the active app is TikTok.</string>
+    <string name="LockTimerTitle">Waiting time</string>
+    <string name="LockTimerDesc">Specify how many minutes you need to wait before locking the screen</string>
+    <string name="LockTimerTitle_Format">%1$s — %2$d min.</string>
 </resources>

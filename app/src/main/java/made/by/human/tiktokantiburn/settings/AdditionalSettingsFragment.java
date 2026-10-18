@@ -13,9 +13,11 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.material.materialswitch.MaterialSwitch;
+import com.google.android.material.slider.Slider;
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
 import com.google.firebase.perf.FirebasePerformance;
 
@@ -30,6 +32,17 @@ public class AdditionalSettingsFragment extends Fragment {
                              @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_settings_additional, container, false);
     }
+
+    TextView afkTimerValues;
+    ConstraintLayout afkTimerBarView;
+    private void UpdateAfkTimerTitles(boolean timerEnabled, int value) {
+        afkTimerValues.setText(getString(R.string.LockTimerTitle_Format, getString(R.string.LockTimerTitle), value));
+        UpdateAfkTimerView(timerEnabled);
+    }
+    private void UpdateAfkTimerView(boolean timerEnabled) {
+        afkTimerBarView.setVisibility(timerEnabled ? View.VISIBLE : View.GONE);
+    }
+
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
@@ -59,6 +72,30 @@ public class AdditionalSettingsFragment extends Fragment {
             Settings.Service.setBool(ctx, "FullScreenAPISwitch", isChecked);
         }));
 
+
+        MaterialSwitch LockPhoneIfAfk = view.findViewById(R.id.LockPhoneIfAfk);
+        LockPhoneIfAfk.setChecked(Settings.Service.getBool(ctx, "LockAfterAFKTime", false));
+        LockPhoneIfAfk.setOnCheckedChangeListener(((buttonView, isChecked) -> {
+            Settings.Service.setBool(ctx, "LockAfterAFKTime", isChecked);
+            UpdateAfkTimerView(isChecked);
+        }));
+
+
+
+
+        afkTimerValues = view.findViewById(R.id.LockTimerTitle);
+        afkTimerBarView = view.findViewById(R.id.AFKTimer);
+        Slider AFKTimer = view.findViewById(R.id.LockTimerSlider);
+        int startAfkTimer = Settings.Service.getInt(ctx, "LockTimer", 8);
+        AFKTimer.setValue(startAfkTimer <= 0 ? 1 : startAfkTimer);
+        UpdateAfkTimerTitles(LockPhoneIfAfk.isChecked(), startAfkTimer);
+
+        AFKTimer.addOnChangeListener((slider, progress, fromUser) -> {
+            int targetValue = (int) progress;
+            if (targetValue <= 0) targetValue = 1; // на всякий случай
+            Settings.Service.setInt(ctx, "LockTimer", targetValue);
+            UpdateAfkTimerTitles(LockPhoneIfAfk.isChecked(), targetValue);
+        });
 
 
 

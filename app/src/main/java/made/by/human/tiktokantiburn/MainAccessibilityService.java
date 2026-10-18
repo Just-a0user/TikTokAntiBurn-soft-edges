@@ -3,14 +3,21 @@ package made.by.human.tiktokantiburn;
 import android.annotation.SuppressLint;
 import android.app.Application;
 import android.content.Intent;
+import android.os.Build;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.accessibility.AccessibilityEvent;
+import android.view.accessibility.AccessibilityNodeInfo;
 import android.view.accessibility.AccessibilityWindowInfo;
 import android.widget.Toast;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import made.by.human.tiktokantiburn.settings.Settings;
 
@@ -30,16 +37,44 @@ public class MainAccessibilityService extends android.accessibilityservice.Acces
         return Settings.Service.getString(this, settingName, defValue);
     }
 
+
+    private final Handler handler = new Handler(Looper.getMainLooper());
+    private final Runnable lockRunnable = this::lockThePhone;
+
+
+    private void removeLockTimer() {handler.removeCallbacks(lockRunnable);}
+    private void resetTimer(AccessibilityEvent event, boolean TikTokOpened) {
+        int eventType = event.getEventType();
+        if ((
+                eventType != AccessibilityEvent.TYPE_VIEW_CLICKED &&
+                eventType != AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED &&
+                eventType != AccessibilityEvent.TYPE_WINDOWS_CHANGED
+            ) || Build.VERSION.SDK_INT < Build.VERSION_CODES.P
+        ) {return;}
+
+
+        removeLockTimer();
+        if (!TikTokOpened) {return;}
+
+        if (GetBoolean("LockAfterAFKTime", false)) {
+            int waitMinutes = Settings.Service.getInt(this, "LockTimer", 8);
+            handler.postDelayed(lockRunnable, waitMinutes * (1000 * 60));
+        }
+    }
+
+    private void lockThePhone() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            performGlobalAction(GLOBAL_ACTION_LOCK_SCREEN);
+        }
+    }
+
     @Override
     public void onAccessibilityEvent(AccessibilityEvent event) {
+        final boolean isClicked = event.getEventType() == AccessibilityEvent.TYPE_VIEW_CLICKED;
         final boolean isWindowsChanged = event.getEventType() == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED || event.getEventType() == AccessibilityEvent.TYPE_WINDOWS_CHANGED;
-        if (!isWindowsChanged) { return; }
+        if (!isWindowsChanged && !isClicked) { return; }
 
         Intent serviceIntent = new Intent(this, FloatingWindowService.class);
-
-
-
-        Log.d("accessibilityService", "isWChaned:" + isWindowsChanged);
         logger.Save("[MyAccessibilityService] - onAccessibilityEvent received", "Is WindowsChanged: "+isWindowsChanged, true, false);
         boolean ClosePopups;
         CompatibilityMode = GetBoolean("Compatibility_MODE", false);
@@ -59,6 +94,8 @@ public class MainAccessibilityService extends android.accessibilityservice.Acces
             }
 
             boolean TikTokOpened = activePackages.contains(GetString("TriggerPacketName", "com.zhiliaoapp.musically"));
+            resetTimer(event, TikTokOpened);
+            if (isClicked) return;
 
             if (GetBoolean("HideWhenKeyboardIsOpen", false) && hasKeyboardPackage()) {
                 if (activePackages.stream().anyMatch(p ->
@@ -73,7 +110,6 @@ public class MainAccessibilityService extends android.accessibilityservice.Acces
                 }
             }
 
-            //Log.d("TikTokOpened: ", activePackages.toString());
             if (activePackages.contains("com.android.launcher")
                     || activePackages.contains("com.google.android.apps.nexuslauncher")
                     || activePackages.contains("com.miui.home") // MIUI

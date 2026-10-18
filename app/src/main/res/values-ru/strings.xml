@@ -102,4 +102,9 @@
     <string name="FloatingWindowsLimitError">Вы достигли лимита окон вашей прошивки</string>
     <string name="GrandOverlayFirst">Пожалуйста, сначала предоставьте разрешение на отображение поверх!</string>
     <string name="ServiceOverlayPermissionNotGranted">Пожалуйста, предоставьте разрешение на отображение поверх!</string>
+    <string name="LockThePhoneTitle">Отключать экран при неактивности</string>
+    <string name="LockThePhoneDesc">Если за определённое время не будет ни одного нажатия - экран отключится. Работает только если активное приложение - TikTok</string>
+    <string name="LockTimerTitle">Время ожидания</string>
+    <string name="LockTimerDesc">Укажите, сколько минут нужно ждать перед тем как заблокировать экран</string>
+    <string name="LockTimerTitle_Format">%1$s — %2$d мин.</string>
 </resources>

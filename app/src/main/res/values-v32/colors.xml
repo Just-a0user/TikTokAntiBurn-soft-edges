@@ -9,6 +9,7 @@
     <color name="SwitchBackground">@color/material_dynamic_primary70</color>
     <color name="ButtonBackground">@color/material_dynamic_neutral_variant80</color>
     <color name="SheetForeground">@color/material_dynamic_neutral_variant90</color>
+    <color name="InlineSetting">@color/material_dynamic_neutral_variant30</color>
     <color name="SeekBackground">@color/material_dynamic_neutral_variant70</color>
     <color name="SeekBackgroundFilled">@color/material_dynamic_neutral_variant90</color>
     <color name="SeekBG">@color/material_dynamic_neutral_variant60</color>

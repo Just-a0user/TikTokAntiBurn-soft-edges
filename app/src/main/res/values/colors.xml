@@ -9,6 +9,7 @@
     <color name="ButtonForeground">#191b23</color>
     <color name="SwitchBackground">#ABACB4</color>
     <color name="ButtonBackground">#c5c6d0</color>
+    <color name="InlineSetting">#44464f</color>
     <color name="SheetForeground">#D1D2DD</color>
     <color name="SeekBackground">#a9abb4</color>
     <color name="SeekBackgroundFilled">#e1e2ec</color>
