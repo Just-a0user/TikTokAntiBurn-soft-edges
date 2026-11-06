@@ -70,6 +70,7 @@
     <string name="Settings_LSP_BinderDesc">Enable this mode to customize the hiding of any elements. After applying the changes, restart TikTok</string>
     <string name="Settings_LSP_BinderTitle_OFF">Quit \"Click to hide\" mode</string>
     <string name="Alpha">Alpha:</string>
+    <string name="AlphaSolid">100% – solid black (blocks touches)</string>
     <string name="Settings_ADD_FULLSCREEN_API_NotSupported">This function is available from Android 9+</string>
     <string name="TargetPackageAppNotFound">Target package ID was not found</string>
     <string name="Settings_Main_ShowDefaultElement">Show default element</string>

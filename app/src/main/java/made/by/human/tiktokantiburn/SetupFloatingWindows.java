@@ -52,6 +52,9 @@ public class SetupFloatingWindows extends Service {
     List<View> blockburnList = new ArrayList<>();
     List<Long> blockburnRadiusesList = new ArrayList<>();
     List<Point> savedPositions = new ArrayList<>();
+    // blocks that are fully opaque black (not touch-through); alpha slider position 101
+    final java.util.Set<View> solidBlocks = new java.util.HashSet<>();
+    static final int ALPHA_SOLID = 101;
 
     TextView elementWidth, elementHeight, elementRadius, elementAlpha;
     SeekBar widthBar, heightBar, radiusBar, alphaBar;
@@ -67,6 +70,7 @@ public class SetupFloatingWindows extends Service {
             windowManager.removeView(lastBlockBurnElement);
             blockburnRadiusesList.remove(blockburnList.indexOf(lastBlockBurnElement));
             blockburnList.remove(lastBlockBurnElement);
+            solidBlocks.remove(lastBlockBurnElement);
             lastBlockBurnElement = null;
             CloseBurnSettings();
             btnAdd.setText(
@@ -171,7 +175,13 @@ public class SetupFloatingWindows extends Service {
         alphaBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-                lastBlockBurnElement.setAlpha(alphaBar.getProgress() / 100f);
+                if (alphaBar.getProgress() >= ALPHA_SOLID) {
+                    solidBlocks.add(lastBlockBurnElement);
+                    lastBlockBurnElement.setAlpha(1f);
+                } else {
+                    solidBlocks.remove(lastBlockBurnElement);
+                    lastBlockBurnElement.setAlpha(alphaBar.getProgress() / 100f);
+                }
                 RefreshSettings(false);
             }
             @Override
@@ -299,13 +309,17 @@ public class SetupFloatingWindows extends Service {
             widthBar.setProgress(BurnWidth);
             heightBar.setProgress(BurnHeight);
             radiusBar.setProgress(Math.toIntExact(getRadiusFor(lastBlockBurnElement)));
-            alphaBar.setProgress((int) (lastBlockBurnElement.getAlpha() * 100f));
+            alphaBar.setProgress(solidBlocks.contains(lastBlockBurnElement) ? ALPHA_SOLID : (int) (lastBlockBurnElement.getAlpha() * 100f));
         }
 
         elementWidth.setText(getString(R.string.ExtendedSetting_Width) + BurnWidth + " px");
         elementHeight.setText(getString(R.string.ExtendedSetting_Height) + BurnHeight + " px");
         elementRadius.setText(getString(R.string.borderRadiusSetting) + (getRadiusFor(lastBlockBurnElement)) + " px");
-        elementAlpha.setText(getString(R.string.Alpha) + ((int) (lastBlockBurnElement.getAlpha() * 100)) + "%");
+        if (solidBlocks.contains(lastBlockBurnElement)) {
+            elementAlpha.setText(getString(R.string.Alpha) + getString(R.string.AlphaSolid));
+        } else {
+            elementAlpha.setText(getString(R.string.Alpha) + ((int) (lastBlockBurnElement.getAlpha() * 100)) + "%");
+        }
     }
 
     private void makeViewDraggable(View view, WindowManager.LayoutParams params) {
@@ -420,7 +434,8 @@ public class SetupFloatingWindows extends Service {
                             lp.x,
                             lp.y,
                             view.getAlpha(),
-                            blockburnRadiusesList.get(blockburnList.indexOf(view))
+                            blockburnRadiusesList.get(blockburnList.indexOf(view)),
+                            solidBlocks.contains(view)
                     )
             );
         }
@@ -513,6 +528,7 @@ public class SetupFloatingWindows extends Service {
             blockburn.setAlpha(
                     blockInfo.alpha
             );
+            if (blockInfo.solid) solidBlocks.add(blockburn);
             makeViewDraggable(blockburn, params);
             windowCount++;
         }

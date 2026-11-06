@@ -50,6 +50,11 @@ public class FloatingWindowService extends Service {
 
     @SuppressLint("InflateParams")
     public void CreateElement(int x, int y, int width, int height, long radius, float alpha, boolean canBeHidden) {
+        CreateElement(x, y, width, height, radius, alpha, canBeHidden, false);
+    }
+
+    @SuppressLint("InflateParams")
+    public void CreateElement(int x, int y, int width, int height, long radius, float alpha, boolean canBeHidden, boolean solid) {
         View floatingView = inflater.inflate(R.layout.blockburn_quad, null);
 
         int displayMode = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL
@@ -70,7 +75,10 @@ public class FloatingWindowService extends Service {
             displayMode |= WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS;
         }
 
-        if (touchThroughMode) {
+        // solid blocks are not touch-through: Android caps the opacity of touch-through overlays
+        // at ~80%, a touchable window can be fully black.
+        final boolean touchThrough = touchThroughMode && !solid;
+        if (touchThrough) {
             displayMode |= WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE;
             floatingView.setClickable(false);
             floatingView.setFocusable(false);
@@ -111,7 +119,7 @@ public class FloatingWindowService extends Service {
         floatingViews.add(floatingView);
         floatingView.animate().alpha(alpha).setDuration(AnimationLength).start();
 
-        if (canBeHidden && !touchThroughMode) {
+        if (canBeHidden && !touchThrough) {
             floatingView.setOnClickListener(v -> {
                 floatingView.animate().alpha(0f).setDuration(AnimationLength).start();
                 mainHandler.postDelayed(() ->
@@ -149,7 +157,7 @@ public class FloatingWindowService extends Service {
         for (int i = 0; i < blockList.size(); i++) {
             if (i >= maxWindows) {return;}
             BlockInfo blockInfo = blockList.get(i);
-            CreateElement(blockInfo.x, blockInfo.y, blockInfo.width, blockInfo.height, blockInfo.radius, blockInfo.alpha, canBeHidden);
+            CreateElement(blockInfo.x, blockInfo.y, blockInfo.width, blockInfo.height, blockInfo.radius, blockInfo.alpha, canBeHidden, blockInfo.solid);
         }
 
     }
