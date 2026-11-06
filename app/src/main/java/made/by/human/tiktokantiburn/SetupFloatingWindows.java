@@ -55,6 +55,21 @@ public class SetupFloatingWindows extends Service {
     // blocks that are fully opaque black; alpha slider positions >= 101 (end of the slider)
     final java.util.Set<View> solidBlocks = new java.util.HashSet<>();
     static final int ALPHA_SOLID = 101;
+    // per-block soft edge in dp (0 = off); missing = use the global default setting "SoftEdgeDp"
+    final java.util.Map<View, Integer> softEdgeMap = new java.util.HashMap<>();
+    TextView elementSoftEdge;
+    SeekBar softEdgeBar;
+
+    private int getSoftEdgeDp(View view) {
+        Integer v = softEdgeMap.get(view);
+        return v != null ? v : -1;
+    }
+
+    private int getEffectiveSoftEdgeDp(View view) {
+        int v = getSoftEdgeDp(view);
+        if (v >= 0) return v;
+        return Math.max(0, Math.min(30, Settings.Service.getInt(this, "SoftEdgeDp", 0)));
+    }
 
     TextView elementWidth, elementHeight, elementRadius, elementAlpha;
     SeekBar widthBar, heightBar, radiusBar, alphaBar;
@@ -71,6 +86,7 @@ public class SetupFloatingWindows extends Service {
             blockburnRadiusesList.remove(blockburnList.indexOf(lastBlockBurnElement));
             blockburnList.remove(lastBlockBurnElement);
             solidBlocks.remove(lastBlockBurnElement);
+            softEdgeMap.remove(lastBlockBurnElement);
             lastBlockBurnElement = null;
             CloseBurnSettings();
             btnAdd.setText(
@@ -154,6 +170,20 @@ public class SetupFloatingWindows extends Service {
         heightBar = floatingMenu.findViewById(R.id.heightBar);
         radiusBar = floatingMenu.findViewById(R.id.radiusBar);
         alphaBar = floatingMenu.findViewById(R.id.alphaBar);
+        elementSoftEdge = floatingMenu.findViewById(R.id.softEdgeTextView);
+        softEdgeBar = floatingMenu.findViewById(R.id.softEdgeBar);
+        softEdgeBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean fromUser) {
+                if (!fromUser || lastBlockBurnElement == null) return;
+                softEdgeMap.put(lastBlockBurnElement, i);
+                RefreshSettings(false);
+            }
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {}
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {}
+        });
         RemoveElementBtn = floatingMenu.findViewById(R.id.removeElement);
         btnSave = floatingMenu.findViewById(R.id.btnSave);
         btnSave.setOnClickListener(v -> SaveSettings());
@@ -309,12 +339,15 @@ public class SetupFloatingWindows extends Service {
             widthBar.setProgress(BurnWidth);
             heightBar.setProgress(BurnHeight);
             radiusBar.setProgress(Math.toIntExact(getRadiusFor(lastBlockBurnElement)));
+            softEdgeBar.setProgress(getEffectiveSoftEdgeDp(lastBlockBurnElement));
             alphaBar.setProgress(solidBlocks.contains(lastBlockBurnElement) ? alphaBar.getMax() : (int) (lastBlockBurnElement.getAlpha() * 100f));
         }
 
         elementWidth.setText(getString(R.string.ExtendedSetting_Width) + BurnWidth + " px");
         elementHeight.setText(getString(R.string.ExtendedSetting_Height) + BurnHeight + " px");
         elementRadius.setText(getString(R.string.borderRadiusSetting) + (getRadiusFor(lastBlockBurnElement)) + " px");
+        int softDp = getEffectiveSoftEdgeDp(lastBlockBurnElement);
+        elementSoftEdge.setText(getString(R.string.SoftEdgeTitle) + ": " + (softDp == 0 ? getString(R.string.SoftEdgeOff) : softDp + " dp"));
         if (solidBlocks.contains(lastBlockBurnElement)) {
             elementAlpha.setText(getString(R.string.Alpha) + getString(R.string.AlphaSolid));
         } else {
@@ -435,7 +468,8 @@ public class SetupFloatingWindows extends Service {
                             lp.y,
                             view.getAlpha(),
                             blockburnRadiusesList.get(blockburnList.indexOf(view)),
-                            solidBlocks.contains(view)
+                            solidBlocks.contains(view),
+                            getSoftEdgeDp(view)
                     )
             );
         }
@@ -529,6 +563,7 @@ public class SetupFloatingWindows extends Service {
                     blockInfo.alpha
             );
             if (blockInfo.solid) solidBlocks.add(blockburn);
+            if (blockInfo.softEdgeDp >= 0) softEdgeMap.put(blockburn, blockInfo.softEdgeDp);
             makeViewDraggable(blockburn, params);
             windowCount++;
         }

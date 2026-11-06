@@ -214,6 +214,28 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/alphaTextView" />
 
+            <TextView
+                android:id="@+id/softEdgeTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/SoftEdgeTitle"
+                android:textColor="@color/ButtonBackground"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/alphaBar" />
+
+            <SeekBar
+                android:id="@+id/softEdgeBar"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:max="30"
+                android:progressBackgroundTint="@color/SeekBackgroundFilled"
+                android:progressTint="@color/SeekBackgroundFilled"
+                android:thumbTint="@color/SeekBackgroundFilled"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/softEdgeTextView" />
+
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>

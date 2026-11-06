@@ -9,6 +9,8 @@ public class BlockInfo {
     public float alpha = 1f;
     /** Fully opaque black: not touch-through, so Android's ~80% overlay opacity cap does not apply. */
     public boolean solid = false;
+    /** Soft edge width in dp for this block. 0 = off, -1 = use the global default setting. */
+    public int softEdgeDp = -1;
 
     public BlockInfo(int width, int height, int x, int y, float alpha, long radius) {
         this.width = width;
@@ -22,6 +24,11 @@ public class BlockInfo {
     public BlockInfo(int width, int height, int x, int y, float alpha, long radius, boolean solid) {
         this(width, height, x, y, alpha, radius);
         this.solid = solid;
+    }
+
+    public BlockInfo(int width, int height, int x, int y, float alpha, long radius, boolean solid, int softEdgeDp) {
+        this(width, height, x, y, alpha, radius, solid);
+        this.softEdgeDp = softEdgeDp;
     }
 
     public BlockInfo() {}

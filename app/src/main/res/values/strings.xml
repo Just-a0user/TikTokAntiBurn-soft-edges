@@ -113,6 +113,7 @@
     <string name="LockTimerTitle_Format">%1$s — %2$d min.</string>
     <string name="AlphaValueProblem">Android 12 and above, “for security purposes” in this mode limits the opacity of elements, making them 20% transparent</string>
     <string name="SoftEdgeTitle">Soft edge</string>
+    <string name="SoftEdgeOff">off</string>
     <string name="SoftEdgeTitle_Format">%1$s — %2$d dp</string>
-    <string name="SoftEdgeDesc">Fades the edge of the blocks softly into the screen instead of a hard line. 0 = off. The black area keeps its size, the fade is added outside of it. Takes effect the next time the blocks are shown.</string>
+    <string name="SoftEdgeDesc">Default soft edge for blocks that have no setting of their own (every block can override it in the edit menu). Fades the edge softly into the screen instead of a hard line. 0 = off. The black area keeps its size, the fade is added outside of it. Takes effect the next time the blocks are shown.</string>
 </resources>

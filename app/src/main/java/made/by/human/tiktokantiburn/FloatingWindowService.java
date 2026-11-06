@@ -44,19 +44,20 @@ public class FloatingWindowService extends Service {
 
 
     /** Width of the soft edge in px (setting "SoftEdgeDp", 0 = hard edge like before). */
-    private int getSoftEdgePx() {
-        int dp = Settings.Service.getInt(this, "SoftEdgeDp", 0);
+    private int getSoftEdgePx(int blockDp) {
+        // blockDp >= 0: per-block value (0 = off); -1: use the global default setting
+        int dp = blockDp >= 0 ? blockDp : Settings.Service.getInt(this, "SoftEdgeDp", 0);
         if (dp <= 0) return 0;
         return (int) (dp * getResources().getDisplayMetrics().density);
     }
 
     @SuppressLint("InflateParams")
     public void CreateElement(int x, int y, int width, int height, long radius, float alpha, boolean canBeHidden) {
-        CreateElement(x, y, width, height, radius, alpha, canBeHidden, false);
+        CreateElement(x, y, width, height, radius, alpha, canBeHidden, false, -1);
     }
 
     @SuppressLint("InflateParams")
-    public void CreateElement(int x, int y, int width, int height, long radius, float alpha, boolean canBeHidden, boolean solid) {
+    public void CreateElement(int x, int y, int width, int height, long radius, float alpha, boolean canBeHidden, boolean solid, int softEdgeDp) {
         View floatingView = inflater.inflate(R.layout.blockburn_quad, null);
 
         int displayMode = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL
@@ -71,7 +72,7 @@ public class FloatingWindowService extends Service {
 
         // Soft edge: the window grows by "feather" px on every side, the solid black core keeps
         // exactly the configured position/size and only the transition to the screen is blurred.
-        final int featherPx = getSoftEdgePx();
+        final int featherPx = getSoftEdgePx(softEdgeDp);
         if (featherPx > 0) {
             // the feathered part may reach beyond the screen edge
             displayMode |= WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS;
@@ -179,7 +180,7 @@ public class FloatingWindowService extends Service {
         for (int i = 0; i < blockList.size(); i++) {
             if (i >= maxWindows) {return;}
             BlockInfo blockInfo = blockList.get(i);
-            CreateElement(blockInfo.x, blockInfo.y, blockInfo.width, blockInfo.height, blockInfo.radius, blockInfo.alpha, canBeHidden, blockInfo.solid);
+            CreateElement(blockInfo.x, blockInfo.y, blockInfo.width, blockInfo.height, blockInfo.radius, blockInfo.alpha, canBeHidden, blockInfo.solid, blockInfo.softEdgeDp);
         }
 
     }
