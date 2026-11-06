@@ -4,7 +4,8 @@ on:
   workflow_dispatch:
   push:
     branches: [master]
-    tags: ["v*"]
+  release:
+    types: [published]
 
 permissions:
   contents: write
@@ -46,12 +47,10 @@ jobs:
           name: TikTokAntiBurn-soft-edge-apk
           path: out/TikTokAntiBurn-soft-edge.apk
 
-      # A release is only created when a version tag (v*) is pushed.
-      - name: Publish release
-        if: startsWith(github.ref, 'refs/tags/v')
+      # When a release is published on GitHub, the APK is built and attached to it.
+      - name: Attach APK to release
+        if: github.event_name == 'release'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release create "${{ github.ref_name }}" out/TikTokAntiBurn-soft-edge.apk \
-            --title "TikTok AntiBurn – Soft Edge ${{ github.ref_name }}" \
-            --notes-file RELEASE_NOTES.md
+          gh release upload "${{ github.event.release.tag_name }}" out/TikTokAntiBurn-soft-edge.apk --clobber
