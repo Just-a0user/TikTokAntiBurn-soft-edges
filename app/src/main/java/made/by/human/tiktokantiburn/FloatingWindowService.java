@@ -34,6 +34,8 @@ public class FloatingWindowService extends Service {
     private WindowManager windowManager;
     private LayoutInflater inflater;
     private final List<View> floatingViews = new ArrayList<>();
+    // which WindowManager a view was added to (normal overlay vs. accessibility overlay)
+    private final java.util.Map<View, WindowManager> viewManagers = new java.util.HashMap<>();
     private boolean WindowsOpened = false;
     boolean useFullScreenAPI, touchThroughMode = true;
 
@@ -77,7 +79,10 @@ public class FloatingWindowService extends Service {
 
         // solid blocks are not touch-through: Android caps the opacity of touch-through overlays
         // at ~80%, a touchable window can be fully black.
-        final boolean touchThrough = touchThroughMode && !solid;
+        // Preferred: an accessibility overlay (trusted, not capped, stays touch-through).
+        final MainAccessibilityService a11y = (solid && touchThroughMode) ? MainAccessibilityService.getInstance() : null;
+        final boolean useA11y = a11y != null;
+        final boolean touchThrough = touchThroughMode && (!solid || useA11y);
         if (touchThrough) {
             displayMode |= WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE;
             floatingView.setClickable(false);
@@ -87,7 +92,7 @@ public class FloatingWindowService extends Service {
         WindowManager.LayoutParams params = new WindowManager.LayoutParams(
                 WindowManager.LayoutParams.WRAP_CONTENT,
                 WindowManager.LayoutParams.WRAP_CONTENT,
-                WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
+                useA11y ? WindowManager.LayoutParams.TYPE_ACCESSIBILITY_OVERLAY : WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
                 displayMode,
                 PixelFormat.TRANSLUCENT
         );
@@ -115,7 +120,24 @@ public class FloatingWindowService extends Service {
 
         floatingView.setAlpha(0f);
         floatingView.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO);
-        windowManager.addView(floatingView, params);
+        WindowManager targetWm = windowManager;
+        if (useA11y) {
+            try {
+                targetWm = (WindowManager) a11y.getSystemService(WINDOW_SERVICE);
+                targetWm.addView(floatingView, params);
+            } catch (Exception e) {
+                // fall back to a normal (touchable) overlay
+                Log.e("FloatingWindowService", "Accessibility overlay failed, using normal overlay", e);
+                targetWm = windowManager;
+                params.type = WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
+                params.flags &= ~WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE;
+                floatingView.setClickable(true);
+                targetWm.addView(floatingView, params);
+            }
+        } else {
+            targetWm.addView(floatingView, params);
+        }
+        viewManagers.put(floatingView, targetWm);
         floatingViews.add(floatingView);
         floatingView.animate().alpha(alpha).setDuration(AnimationLength).start();
 
@@ -196,13 +218,15 @@ public class FloatingWindowService extends Service {
         for (View view : floatingViews) {
             if (view != null && view.getParent() != null) {
                 try {
-                    windowManager.removeView(view);
+                    WindowManager wm = viewManagers.get(view);
+                    (wm != null ? wm : windowManager).removeView(view);
                 } catch (Exception e) {
                     Log.e("FloatingWindowService", "Ошибка при удалении Window: ", e);
                 }
             }
         }
         floatingViews.clear();
+        viewManagers.clear();
     }
 
     @Override

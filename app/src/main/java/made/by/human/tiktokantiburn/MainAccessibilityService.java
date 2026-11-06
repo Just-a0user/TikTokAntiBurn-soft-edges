@@ -175,9 +175,31 @@ public class MainAccessibilityService extends android.accessibilityservice.Acces
 
 
     private final Set<String> activePackages = new HashSet<>();
+
+    // Running instance, used by FloatingWindowService to create TYPE_ACCESSIBILITY_OVERLAY windows
+    // (trusted overlays: no ~80% opacity cap, even while touches pass through).
+    private static volatile MainAccessibilityService instance;
+
+    public static MainAccessibilityService getInstance() {
+        return instance;
+    }
+
+    @Override
+    public boolean onUnbind(android.content.Intent intent) {
+        instance = null;
+        return super.onUnbind(intent);
+    }
+
+    @Override
+    public void onDestroy() {
+        instance = null;
+        super.onDestroy();
+    }
+
     @Override
     public void onServiceConnected() {
         super.onServiceConnected();
+        instance = this;
         Log.d("MyAccessibilityService", "Accessibility Service connected");
         if (LogSystem.getInstanceOrNull() == null) {
             LogSystem.init((Application) getApplicationContext());

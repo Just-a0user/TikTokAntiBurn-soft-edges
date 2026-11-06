@@ -205,7 +205,7 @@
                 android:id="@+id/alphaBar"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:max="101"
+                android:max="110"
                 android:min="30"
                 android:progressBackgroundTint="@color/SeekBackgroundFilled"
                 android:progressTint="@color/SeekBackgroundFilled"

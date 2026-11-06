@@ -52,7 +52,7 @@ public class SetupFloatingWindows extends Service {
     List<View> blockburnList = new ArrayList<>();
     List<Long> blockburnRadiusesList = new ArrayList<>();
     List<Point> savedPositions = new ArrayList<>();
-    // blocks that are fully opaque black (not touch-through); alpha slider position 101
+    // blocks that are fully opaque black; alpha slider positions >= 101 (end of the slider)
     final java.util.Set<View> solidBlocks = new java.util.HashSet<>();
     static final int ALPHA_SOLID = 101;
 
@@ -309,7 +309,7 @@ public class SetupFloatingWindows extends Service {
             widthBar.setProgress(BurnWidth);
             heightBar.setProgress(BurnHeight);
             radiusBar.setProgress(Math.toIntExact(getRadiusFor(lastBlockBurnElement)));
-            alphaBar.setProgress(solidBlocks.contains(lastBlockBurnElement) ? ALPHA_SOLID : (int) (lastBlockBurnElement.getAlpha() * 100f));
+            alphaBar.setProgress(solidBlocks.contains(lastBlockBurnElement) ? alphaBar.getMax() : (int) (lastBlockBurnElement.getAlpha() * 100f));
         }
 
         elementWidth.setText(getString(R.string.ExtendedSetting_Width) + BurnWidth + " px");
