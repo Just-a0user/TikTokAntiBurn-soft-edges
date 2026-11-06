@@ -73,6 +73,18 @@ public class AdditionalSettingsFragment extends Fragment {
         }));
 
 
+        TextView softEdgeTitle = view.findViewById(R.id.SoftEdgeTitle);
+        Slider softEdgeSlider = view.findViewById(R.id.SoftEdgeSlider);
+        int startSoftEdge = Math.max(0, Math.min(30, Settings.Service.getInt(ctx, "SoftEdgeDp", 0)));
+        softEdgeSlider.setValue(startSoftEdge);
+        softEdgeTitle.setText(getString(R.string.SoftEdgeTitle_Format, getString(R.string.SoftEdgeTitle), startSoftEdge));
+        softEdgeSlider.addOnChangeListener((slider, value, fromUser) -> {
+            int dp = (int) value;
+            Settings.Service.setInt(ctx, "SoftEdgeDp", dp);
+            softEdgeTitle.setText(getString(R.string.SoftEdgeTitle_Format, getString(R.string.SoftEdgeTitle), dp));
+        });
+
+
         MaterialSwitch LockPhoneIfAfk = view.findViewById(R.id.LockPhoneIfAfk);
         LockPhoneIfAfk.setChecked(Settings.Service.getBool(ctx, "LockAfterAFKTime", false));
         LockPhoneIfAfk.setOnCheckedChangeListener(((buttonView, isChecked) -> {

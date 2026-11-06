@@ -135,6 +135,55 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/Additional_SoftEdge"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="4dp"
+            android:background="@drawable/fast_setting_bg"
+            android:padding="12dp">
+
+            <TextView
+                android:id="@+id/SoftEdgeTitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@string/SoftEdgeTitle"
+                android:textColor="@color/SeekBackgroundFilled"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <com.google.android.material.slider.Slider
+                android:id="@+id/SoftEdgeSlider"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="-8dp"
+                android:layout_marginEnd="-8dp"
+                android:contentDescription="@string/SoftEdgeTitle"
+                android:stepSize="1"
+                android:value="0"
+                android:valueFrom="0"
+                android:valueTo="30"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/SoftEdgeTitle" />
+
+            <TextView
+                android:id="@+id/SoftEdgeDesc"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:alpha="0.75"
+                android:paddingBottom="6dp"
+                android:text="@string/SoftEdgeDesc"
+                android:textColor="@color/SeekBackgroundFilled"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/SoftEdgeSlider" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
         <View
             android:id="@+id/divider10"
             android:layout_width="match_parent"

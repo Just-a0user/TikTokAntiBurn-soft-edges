@@ -41,6 +41,13 @@ public class FloatingWindowService extends Service {
 
 
 
+    /** Width of the soft edge in px (setting "SoftEdgeDp", 0 = hard edge like before). */
+    private int getSoftEdgePx() {
+        int dp = Settings.Service.getInt(this, "SoftEdgeDp", 0);
+        if (dp <= 0) return 0;
+        return (int) (dp * getResources().getDisplayMetrics().density);
+    }
+
     @SuppressLint("InflateParams")
     public void CreateElement(int x, int y, int width, int height, long radius, float alpha, boolean canBeHidden) {
         View floatingView = inflater.inflate(R.layout.blockburn_quad, null);
@@ -53,6 +60,14 @@ public class FloatingWindowService extends Service {
             displayMode |= WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN;
             displayMode |= WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS;
             displayMode |= WindowManager.LayoutParams.FLAG_LAYOUT_INSET_DECOR;
+        }
+
+        // Soft edge: the window grows by "feather" px on every side, the solid black core keeps
+        // exactly the configured position/size and only the transition to the screen is blurred.
+        final int featherPx = getSoftEdgePx();
+        if (featherPx > 0) {
+            // the feathered part may reach beyond the screen edge
+            displayMode |= WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS;
         }
 
         if (touchThroughMode) {
@@ -74,16 +89,20 @@ public class FloatingWindowService extends Service {
 
 
         params.gravity = Gravity.TOP | Gravity.START;
-        params.x = x;
-        params.y = y;
-        params.width = width;
-        params.height = height;
+        params.x = x - featherPx;
+        params.y = y - featherPx;
+        params.width = width + 2 * featherPx;
+        params.height = height + 2 * featherPx;
 
-        GradientDrawable drawable = new GradientDrawable();
-        drawable.setShape(GradientDrawable.RECTANGLE);
-        drawable.setColor(Color.BLACK);
-        drawable.setCornerRadius(radius);
-        floatingView.setBackground(drawable);
+        if (featherPx > 0) {
+            floatingView.setBackground(new SoftEdgeDrawable(featherPx, radius));
+        } else {
+            GradientDrawable drawable = new GradientDrawable();
+            drawable.setShape(GradientDrawable.RECTANGLE);
+            drawable.setColor(Color.BLACK);
+            drawable.setCornerRadius(radius);
+            floatingView.setBackground(drawable);
+        }
 
 
         floatingView.setAlpha(0f);

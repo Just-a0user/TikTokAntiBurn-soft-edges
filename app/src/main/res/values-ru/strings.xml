@@ -108,4 +108,7 @@
     <string name="LockTimerDesc">Укажите, сколько минут нужно ждать перед тем как заблокировать экран</string>
     <string name="LockTimerTitle_Format">%1$s — %2$d мин.</string>
     <string name="AlphaValueProblem">"Android 12 и выше, \"в целях безопасности\" в  этом режиме, ограничивает непрозрачность элементов делая их прозрачными на 20%. "</string>
+    <string name="SoftEdgeTitle">Мягкий край</string>
+    <string name="SoftEdgeTitle_Format">%1$s — %2$d dp</string>
+    <string name="SoftEdgeDesc">Плавно растушёвывает край плашек вместо резкой линии. 0 = выключено. Чёрная область сохраняет размер, растушёвка добавляется снаружи. Применяется при следующем показе плашек.</string>
 </resources>
